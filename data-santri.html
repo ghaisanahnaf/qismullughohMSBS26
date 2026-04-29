@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Data Santri — MSBS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--gold-dim:#8B6E2E;--gold-faint:rgba(201,168,76,0.08);--deep:#08080F;--panel:#0F0F1A;--card:#141420;--card2:#1A1A28;--border:rgba(201,168,76,0.15);--border-md:rgba(201,168,76,0.3);--text:#F0EAD6;--muted:#9990CC;--dim:rgba(201,168,76,0.3);--red:#FF6B6B;--red-bg:rgba(255,107,107,0.12);--amber:#FFB347;--amber-bg:rgba(255,179,71,0.12);--green:#5EC98A;--green-bg:rgba(94,201,138,0.12);--sidebar:230px}
+html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;color:var(--text);font-size:14px}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:99px}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar);flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:20;transition:transform .3s}
+.sb-logo{padding:1.4rem 1.4rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.logo-mark{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--gold);line-height:1}
+.logo-sub{font-size:.55rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-top:4px;line-height:1.4}
+.nav{flex:1;padding:.6rem 0;overflow-y:auto}
+.nav-sec{font-size:.52rem;letter-spacing:.3em;text-transform:uppercase;color:var(--dim);padding:.8rem 1.2rem .3rem}
+.nav-item{display:flex;align-items:center;gap:10px;padding:.55rem 1.2rem;font-size:.78rem;color:var(--muted);cursor:pointer;border-left:2px solid transparent;transition:all .18s}
+.nav-item:hover{color:var(--text);background:var(--gold-faint);border-left-color:rgba(201,168,76,0.3)}
+.nav-item.active{color:var(--gold-light);border-left-color:var(--gold);background:var(--gold-faint);font-weight:500}
+.nav-icon{font-size:.85rem;width:16px;text-align:center;flex-shrink:0}
+.sb-foot{padding:.85rem 1.2rem;border-top:1px solid var(--border);flex-shrink:0}
+.user-row{display:flex;align-items:center;gap:8px}
+.user-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold-dim),var(--gold));display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:600;color:#000;flex-shrink:0}
+.user-name{font-size:.68rem;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1}
+.logout{background:none;border:none;color:var(--dim);cursor:pointer;font-size:.8rem;transition:color .2s}
+.logout:hover{color:var(--red)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:52px;flex-shrink:0;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.2rem;gap:.8rem}
+.menu-btn{display:none;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:4px}
+.menu-btn:hover{color:var(--gold)}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.chip{font-size:.68rem;color:var(--muted);background:var(--card);border:1px solid var(--border);padding:4px 10px;border-radius:2px}
+.refresh-btn{background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);font-size:.7rem;padding:4px 10px;cursor:pointer;transition:all .2s}
+.refresh-btn:hover{border-color:var(--gold-dim);color:var(--gold-light)}
+.content{flex:1;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:1rem}
+.sec-label{font-size:.55rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-dim);display:flex;align-items:center;gap:10px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.mini-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.mini{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:.85rem 1rem;display:flex;align-items:center;gap:12px;transition:border-color .2s}
+.mini:hover{border-color:var(--border-md)}
+.mini-ico{font-size:1.1rem;opacity:.7}
+.mini-lbl{font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.mini-val{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;line-height:1;color:var(--text)}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.search-w{position:relative;flex:1;min-width:200px}
+.search-w input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:2px;padding:.55rem .85rem .55rem 2rem;font-family:'Outfit',sans-serif;font-size:.8rem;color:var(--text);outline:none;transition:border-color .2s}
+.search-w input:focus{border-color:var(--gold-dim)}
+.search-w input::placeholder{color:rgba(240,234,214,.25)}
+.search-ico{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.8rem;pointer-events:none}
+.fsel{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:.55rem .85rem;font-family:'Outfit',sans-serif;font-size:.78rem;color:var(--text);outline:none;cursor:pointer;transition:border-color .2s}
+.fsel:focus{border-color:var(--gold-dim)}
+.fsel option{background:var(--card2)}
+.pcard{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1rem}
+.tbl-wrap{overflow-x:auto}
+.dtbl{width:100%;border-collapse:collapse;font-size:.76rem}
+.dtbl th{text-align:left;padding:7px 11px;color:var(--muted);font-weight:400;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;transition:color .2s}
+.dtbl th:hover{color:var(--gold-light)}
+.dtbl td{padding:9px 11px;border-bottom:1px solid rgba(201,168,76,.04);color:var(--text);vertical-align:middle}
+.dtbl tbody tr:last-child td{border-bottom:none}
+.dtbl tbody tr:hover td{background:var(--gold-faint)}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.6rem}
+.pill-r{background:var(--red-bg);color:var(--red)}.pill-a{background:var(--amber-bg);color:var(--amber)}.pill-g{background:var(--green-bg);color:var(--green)}
+.pn{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:300}
+.av{width:28px;height:28px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.55rem;color:var(--muted)}
+.nc{display:flex;align-items:center;gap:9px}
+.rb{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:.6rem;font-weight:600}
+.rb1{background:rgba(201,168,76,.2);color:var(--gold)}.rb2{background:rgba(240,234,214,.1);color:var(--text)}.rb3{background:rgba(255,179,71,.12);color:var(--amber)}.rbn{background:rgba(255,255,255,.05);color:var(--muted)}
+.pag{display:flex;align-items:center;justify-content:space-between;margin-top:.9rem;flex-wrap:wrap;gap:6px}
+.pag-info{font-size:.68rem;color:var(--muted)}
+.pag-btns{display:flex;gap:3px}
+.pb{background:none;border:1px solid var(--border);border-radius:2px;color:var(--muted);font-size:.68rem;padding:4px 9px;cursor:pointer;transition:all .2s}
+.pb:hover,.pb.on{border-color:var(--gold-dim);color:var(--gold-light);background:var(--gold-faint)}
+.pb:disabled{opacity:.25;cursor:not-allowed}
+.c-load{text-align:center;color:var(--muted);font-size:.75rem;padding:2rem 0}
+.spin{display:inline-block;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Bar mini per santri */
+.pbar-bg{height:3px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;width:60px;display:inline-block;vertical-align:middle;margin-left:6px}
+.pbar-f{height:100%;border-radius:99px;transition:width .8s ease}
+@media(max-width:768px){.sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.menu-btn{display:block}.mini-row{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.mini-row{grid-template-columns:1fr}}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:15;backdrop-filter:blur(3px)}
+.fade{opacity:0;transform:translateY(8px);animation:fu .45s forwards}
+@keyframes fu{to{opacity:1;transform:translateY(0)}}
+.d1{animation-delay:.03s}.d2{animation-delay:.07s}.d3{animation-delay:.11s}
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay" onclick="closeSb()"></div>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo"><div class="logo-mark">MSBS</div><div class="logo-sub">Sistem Pelanggaran Bahasa<br>Qismullughoh</div></div>
+  <nav class="nav">
+    <div class="nav-sec">Utama</div>
+    <div class="nav-item" onclick="go('dashboard.html')"><span class="nav-icon">◈</span>Dashboard</div>
+    <div class="nav-item" onclick="go('form-input-pelanggaran.html')"><span class="nav-icon">✦</span>Input Pelanggaran</div>
+    <div class="nav-sec">Data</div>
+    <div class="nav-item active"><span class="nav-icon">◫</span>Data Santri</div>
+    <div class="nav-item" onclick="go('riwayat.html')"><span class="nav-icon">◱</span>Riwayat Pelanggaran</div>
+    <div class="nav-item" onclick="go('rekap.html')"><span class="nav-icon">◻</span>Rekap & Laporan</div>
+    <div class="nav-sec">Sistem</div>
+    <div class="nav-item" onclick="doLogout()"><span class="nav-icon">↩</span>Keluar</div>
+  </nav>
+  <div class="sb-foot"><div class="user-row"><div class="user-av">QL</div><span class="user-name">qismullughohmsbs</span><button class="logout" onclick="doLogout()">↩</button></div></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleSb()">☰</button>
+    <div class="page-title">Data Santri</div>
+    <div class="topbar-right">
+      <button class="refresh-btn" onclick="loadAll()">⟳ Refresh</button>
+      <div class="chip" id="dateChip"></div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="sec-label fade d1">Statistik Santri</div>
+    <div class="mini-row fade d1">
+      <div class="mini"><div class="mini-ico">◈</div><div><div class="mini-lbl">Total Santri Terdaftar</div><div class="mini-val" id="ms1"><span class="spin">◌</span></div></div></div>
+      <div class="mini"><div class="mini-ico">⚠</div><div><div class="mini-lbl">Pernah Melanggar</div><div class="mini-val" id="ms2"><span class="spin">◌</span></div></div></div>
+      <div class="mini"><div class="mini-ico">◑</div><div><div class="mini-lbl">Total Poin Terkumpul</div><div class="mini-val" id="ms3"><span class="spin">◌</span></div></div></div>
+    </div>
+
+    <div class="sec-label fade d2">Daftar Lengkap Santri</div>
+    <div class="toolbar fade d2">
+      <div class="search-w">
+        <span class="search-ico">⌕</span>
+        <input type="text" id="srch" placeholder="Cari nama santri..." oninput="applyFilter()"/>
+      </div>
+      <select class="fsel" id="fKelas" onchange="applyFilter()">
+        <option value="">Semua Kelas</option>
+        <option value="Kelas 1">Kelas 1</option>
+        <option value="Kelas 2">Kelas 2</option>
+        <option value="Kelas 3">Kelas 3</option>
+      </select>
+      <select class="fsel" id="fStatus" onchange="applyFilter()">
+        <option value="">Semua Status</option>
+        <option value="perlu">Perlu Perhatian (≥10)</option>
+        <option value="pantau">Dipantau (5–9)</option>
+        <option value="baik">Baik (&lt;5)</option>
+      </select>
+      <select class="fsel" id="fSort" onchange="applyFilter()">
+        <option value="poin">Urutkan: Poin ↓</option>
+        <option value="nama">Urutkan: A–Z</option>
+        <option value="kasus">Urutkan: Kasus ↓</option>
+      </select>
+    </div>
+
+    <div class="pcard fade d3">
+      <div class="tbl-wrap">
+        <table class="dtbl">
+          <thead>
+            <tr>
+              <th style="width:36px">#</th>
+              <th>Nama Santri</th>
+              <th>Kelas</th>
+              <th>Total Kasus</th>
+              <th>Total Poin</th>
+              <th>Pelanggaran Terbanyak</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="tblBody"><tr><td colspan="7" class="c-load"><span class="spin">◌</span> Memuat data santri...</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pag">
+        <div class="pag-info" id="pagInfo">—</div>
+        <div class="pag-btns" id="pagBtns"></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+const URL_API='https://script.google.com/macros/s/AKfycbwpgxBVltmc4sKNh-4mMNal5pWeG8iJaF3xWeFiDjwLACYDXrRKckYMxD45mHjErwI2/exec';
+const PER=20;
+let allSantri=[],filtered=[],page=1,maxPoin=1;
+
+document.getElementById('dateChip').textContent=new Date().toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+async function loadAll(){
+  document.getElementById('tblBody').innerHTML='<tr><td colspan="7" class="c-load"><span class="spin">◌</span> Memuat...</td></tr>';
+  ['ms1','ms2','ms3'].forEach(id=>document.getElementById(id).innerHTML='<span class="spin">◌</span>');
+  try{
+    const res=await fetch(URL_API+'?action=getAllSantri&t='+Date.now());
+    const json=await res.json();
+    if(json.status!=='ok') throw new Error();
+    allSantri=json.data||[];
+    maxPoin=Math.max(1,...allSantri.map(s=>s.poin));
+    document.getElementById('ms1').textContent=allSantri.length;
+    document.getElementById('ms2').textContent=allSantri.filter(s=>s.kasus>0).length;
+    document.getElementById('ms3').textContent=allSantri.reduce((a,s)=>a+s.poin,0);
+    applyFilter();
+  }catch(e){
+    document.getElementById('tblBody').innerHTML='<tr><td colspan="7" class="c-load" style="color:var(--amber)">⚠ Gagal memuat. Klik Refresh.</td></tr>';
+    ['ms1','ms2','ms3'].forEach(id=>document.getElementById(id).textContent='—');
+  }
+}
+
+function applyFilter(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  const k=document.getElementById('fKelas').value;
+  const st=document.getElementById('fStatus').value;
+  const so=document.getElementById('fSort').value;
+  filtered=allSantri.filter(s=>{
+    const mq=s.nama.toLowerCase().includes(q);
+    const mk=!k||s.kelas===k;
+    const ms=!st||(st==='perlu'&&s.poin>=10)||(st==='pantau'&&s.poin>=5&&s.poin<10)||(st==='baik'&&s.poin<5);
+    return mq&&mk&&ms;
+  });
+  if(so==='poin') filtered.sort((a,b)=>b.poin-a.poin);
+  else if(so==='nama') filtered.sort((a,b)=>a.nama.localeCompare(b.nama));
+  else filtered.sort((a,b)=>b.kasus-a.kasus);
+  page=1;render();
+}
+
+function render(){
+  const s=(page-1)*PER,e=s+PER,rows=filtered.slice(s,e);
+  const tb=document.getElementById('tblBody');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="7" class="c-load">Tidak ada data</td></tr>';renderPag();return;}
+  tb.innerHTML='';
+  rows.forEach((s2,i)=>{
+    const rank=s+i+1;
+    const rcls=rank===1?'rb1':rank===2?'rb2':rank===3?'rb3':'rbn';
+    const init=s2.nama.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const sc=s2.poin>=10?'pill-r':s2.poin>=5?'pill-a':'pill-g';
+    const st=s2.poin>=10?'Perlu Perhatian':s2.poin>=5?'Dipantau':'Baik';
+    const pc=s2.poin>=10?'var(--red)':s2.poin>=5?'var(--amber)':'var(--green)';
+    const pct=Math.round(s2.poin/maxPoin*100);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><span class="rb ${rcls}">${rank}</span></td>
+    <td><div class="nc"><div class="av">${init}</div>${s2.nama}</div></td>
+    <td style="color:var(--muted)">${s2.kelas||'—'}</td>
+    <td style="color:var(--muted)">${s2.kasus}</td>
+    <td><span class="pn" style="color:${pc}">${s2.poin}</span><span class="pbar-bg"><span class="pbar-f" style="width:0%;background:${pc}" data-w="${pct}%"></span></span></td>
+    <td style="color:var(--muted);font-size:.72rem">${s2.topJenis}</td>
+    <td><span class="pill ${sc}">${st}</span></td>`;
+    tb.appendChild(tr);
+    setTimeout(()=>tr.querySelector('.pbar-f').style.width=pct+'%',100+i*30);
+  });
+  renderPag();
+}
+
+function renderPag(){
+  const tot=filtered.length,pages=Math.ceil(tot/PER)||1;
+  const s=(page-1)*PER;
+  document.getElementById('pagInfo').textContent=`Menampilkan ${Math.min(s+1,tot)}–${Math.min(s+PER,tot)} dari ${tot} santri`;
+  const pb=document.getElementById('pagBtns');pb.innerHTML='';
+  const prev=document.createElement('button');prev.className='pb';prev.textContent='←';prev.disabled=page===1;
+  prev.onclick=()=>{page--;render();};pb.appendChild(prev);
+  for(let p=1;p<=Math.min(pages,7);p++){
+    const b=document.createElement('button');b.className='pb'+(p===page?' on':'');b.textContent=p;
+    const pp=p;b.onclick=()=>{page=pp;render();};pb.appendChild(b);
+  }
+  const next=document.createElement('button');next.className='pb';next.textContent='→';next.disabled=page>=pages;
+  next.onclick=()=>{page++;render();};pb.appendChild(next);
+}
+
+function go(u){window.location.href=u;}
+function doLogout(){if(confirm('Keluar?')){sessionStorage.removeItem('msbs_auth');window.location.href='login.html';}}
+function toggleSb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').style.display='block';}
+function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').style.display='none';}
+loadAll();
+</script>
+</body>
+</html>
