@@ -231,14 +231,10 @@ const mo=(now.getMonth()+1).toString().padStart(2,'0');
       sel.appendChild(opt);
       m++;if(m>12){m=1;y++;}
     }
-    // restore selected value
-    if(curVal) sel.value=curVal;
-    // if nothing selected or value gone, select current month
-    if(!sel.value){
-      const now2=new Date();
-      const def=now2.getFullYear()+'-'+String(now2.getMonth()+1).padStart(2,'0');
-      sel.value=def;
-    }
+    // Restore previous selection, or default to current month
+    const now2=new Date();
+    const curMonth=now2.getFullYear()+'-'+String(now2.getMonth()+1).padStart(2,'0');
+    sel.value=(curVal && sel.querySelector('[value="'+curVal+'"]')) ? curVal : curMonth;
   }
 
   function init(selId){
@@ -247,6 +243,7 @@ const mo=(now.getMonth()+1).toString().padStart(2,'0');
       const sel=document.getElementById(selId);
       if(!sel){setTimeout(run,50);return;}
       buildOptions(sel, extraBuffer);
+    loadRekap(); // load data for current month
       // Extend when user opens dropdown (focus) or changes value near end
       sel.addEventListener('focus',function(){
         const opts=[...sel.options];
