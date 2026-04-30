@@ -114,9 +114,34 @@ html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;col
 @media(max-width:1000px){.ctrl-grid{grid-template-columns:1fr 1fr}.sum-row{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}}
 @media(max-width:768px){.sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.menu-btn{display:block}.ctrl-grid{grid-template-columns:1fr}.sum-row{grid-template-columns:1fr 1fr}}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:15;backdrop-filter:blur(3px)}
+
+/* Kelas filter tabs */
+.kelas-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.ktab{padding:.45rem .85rem;border:1px solid var(--border);border-radius:2px;font-family:'Outfit',sans-serif;font-size:.68rem;cursor:pointer;transition:all .2s;background:none;color:var(--muted);letter-spacing:.05em}
+.ktab:hover{border-color:var(--border-md);color:var(--text)}
+.ktab.on{border-color:var(--gold);background:var(--gold-faint);color:var(--gold-light)}
+
+/* Per-kelas summary cards */
+.kelas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.kelas-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:.75rem 1rem}
+.kelas-card-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+.kelas-card-name{font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold-dim)}
+.kelas-card-badge{font-size:.6rem;background:var(--gold-faint);border:1px solid var(--gold-dim);color:var(--gold-light);padding:1px 7px;border-radius:99px}
+.kelas-stats{display:flex;gap:1.2rem}
+.ks-item{display:flex;flex-direction:column;gap:2px}
+.ks-val{font-family:'Cormorant Garamond',serif;font-size:1.4rem;line-height:1;color:var(--text)}
+.ks-lbl{font-size:.58rem;color:var(--muted)}
+.kelas-bar-wrap{margin-top:.6rem;display:flex;flex-direction:column;gap:4px}
+.kelas-bar-row{display:flex;align-items:center;gap:6px;font-size:.62rem;color:var(--muted)}
+.kelas-bar-bg{flex:1;height:2px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
+.kelas-bar-fill{height:100%;border-radius:99px;transition:width 1s ease}
+
+@media(max-width:900px){.kelas-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.kelas-grid{grid-template-columns:1fr}}
 .fade{opacity:0;transform:translateY(8px);animation:fu .45s forwards}
 @keyframes fu{to{opacity:1;transform:translateY(0)}}
 .d1{animation-delay:.03s}.d2{animation-delay:.07s}.d3{animation-delay:.11s}.d4{animation-delay:.15s}
+
 </style>
 </head>
 <body>
@@ -148,7 +173,7 @@ html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;col
     <!-- CONTROL -->
     <div class="sec-label fade d1">Pengaturan Laporan</div>
     <div class="ctrl-panel fade d1">
-      <div class="ctrl-grid">
+      <div class="ctrl-grid" style="grid-template-columns:1fr 1fr 1fr auto auto">
         <div class="ctrl-field">
           <div class="ctrl-label">Mode Tampilan</div>
           <div class="mode-tabs">
@@ -158,9 +183,18 @@ html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;col
         </div>
         <div class="ctrl-field">
           <div class="ctrl-label">Pilih Bulan</div>
-          <select class="ctrl-sel" id="selBulan">
+          <select class="ctrl-sel" id="selBulan" onchange="loadRekap()">
             
           </select>
+        </div>
+        <div class="ctrl-field">
+          <div class="ctrl-label">Filter Kelas</div>
+          <div class="kelas-tabs">
+            <button class="ktab on" id="kAll"  onclick="setKelas('semua',this)">Semua</button>
+            <button class="ktab" id="kK1" onclick="setKelas('Kelas 1',this)">Kelas 1</button>
+            <button class="ktab" id="kK2" onclick="setKelas('Kelas 2',this)">Kelas 2</button>
+            <button class="ktab" id="kK3" onclick="setKelas('Kelas 3',this)">Kelas 3</button>
+          </div>
         </div>
         <button class="load-btn" onclick="loadRekap()">Tampilkan</button>
         <button class="export-btn" id="exportBtn" onclick="doExport()" disabled>⬆ Ekspor ke Sheets</button>
@@ -175,6 +209,11 @@ html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;col
       <div class="sum-card"><div class="sum-lbl">Santri Melanggar</div><div class="sum-val" id="su3">—</div><div class="sum-sub">santri unik</div></div>
       <div class="sum-card"><div class="sum-lbl">Rata-rata Poin</div><div class="sum-val" id="su4">—</div><div class="sum-sub">per pelanggaran</div></div>
     </div>
+
+
+    <!-- PER KELAS SUMMARY -->
+    <div class="sec-label fade d3" id="kelasSumLabel" style="display:none">Rekap per Kelas</div>
+    <div class="kelas-grid fade d3" id="kelasGrid" style="display:none"></div>
 
     <!-- CHART + CATS -->
     <div class="row2 fade d3">
@@ -282,10 +321,85 @@ const mo=(now.getMonth()+1).toString().padStart(2,'0');
 })();
 // month selector 'selBulan' set by dynamic builder above
 
+
+let kelasFilter='semua';
+
+function setKelas(k, btn){
+  kelasFilter=k;
+  document.querySelectorAll('.ktab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  loadRekap();
+}
+
+function filterByKelas(data){
+  if(kelasFilter==='semua') return data;
+  return data.filter(r=>(r.kelas||'')===kelasFilter);
+}
+
+function renderKelasGrid(allData){
+  const KELAS=['Kelas 1','Kelas 2','Kelas 3'];
+  const KELAS_COLOR=['#5E9CE8','#5EC98A','#C9A84C'];
+  const grid=document.getElementById('kelasGrid');
+  const label=document.getElementById('kelasSumLabel');
+
+  if(kelasFilter!=='semua'){grid.style.display='none';label.style.display='none';return;}
+
+  const maxPoin=Math.max(1,...KELAS.map(k=>allData.filter(r=>r.kelas===k).reduce((a,r)=>a+(Number(r.poin)||0),0)));
+  grid.innerHTML='';
+
+  KELAS.forEach((k,ki)=>{
+    const rows=allData.filter(r=>r.kelas===k);
+    const tot=rows.length;
+    const poin=rows.reduce((a,r)=>a+(Number(r.poin)||0),0);
+    const unik=[...new Set(rows.map(r=>r.nama))].length;
+    const avg=tot?(poin/tot).toFixed(1):'0';
+    const pct=Math.round(poin/maxPoin*100);
+
+    // per-cat breakdown
+    const catBreak=CATS.map(cat=>{
+      const n=rows.filter(r=>r.jenis===cat.name).length;
+      return {name:cat.name,n,color:cat.color};
+    }).filter(x=>x.n>0);
+
+    const div=document.createElement('div');
+    div.className='kelas-card';
+    div.innerHTML=`
+      <div class="kelas-card-hd">
+        <span class="kelas-card-name">${k}</span>
+        <span class="kelas-card-badge">${tot} kasus</span>
+      </div>
+      <div class="kelas-stats">
+        <div class="ks-item"><span class="ks-val" style="color:${KELAS_COLOR[ki]}">${poin}</span><span class="ks-lbl">Total Poin</span></div>
+        <div class="ks-item"><span class="ks-val">${unik}</span><span class="ks-lbl">Santri</span></div>
+        <div class="ks-item"><span class="ks-val">${avg}</span><span class="ks-lbl">Rata Poin</span></div>
+      </div>
+      <div class="kelas-bar-wrap">
+        ${catBreak.map(x=>`
+          <div class="kelas-bar-row">
+            <span style="width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x.name}</span>
+            <div class="kelas-bar-bg"><div class="kelas-bar-fill" style="width:0%;background:${x.color}" data-pct="${Math.round(x.n/(tot||1)*100)}"></div></div>
+            <span style="width:22px;text-align:right">${x.n}</span>
+          </div>`).join('')}
+        ${catBreak.length===0?'<span style="font-size:.65rem;color:var(--muted)">Tidak ada pelanggaran</span>':''}
+      </div>`;
+    grid.appendChild(div);
+    // animate bars
+    setTimeout(()=>{
+      div.querySelectorAll('.kelas-bar-fill').forEach(el=>{
+        el.style.width=el.dataset.pct+'%';
+      });
+    }, 200+ki*100);
+  });
+
+  grid.style.display='grid';
+  label.style.display='flex';
+}
+
 function setMode(m,btn){
   mode=m;
   document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
+  loadRekap();
 }
 
 function animN(id,v,dec=0){
@@ -304,17 +418,21 @@ async function loadRekap(){
   document.getElementById('periodeArea').innerHTML='<div class="c-load"><span class="spin">◌</span> Memuat rekap...</div>';
 
   try{
-    let data=[], periodeGroups=[];
+    let data=[], periodeGroups=[], filteredData=[];
     if(mode==='bulan'){
       const res=await fetch(URL_API+'?action=getRekapBulan&bulan='+bulan+'&t='+Date.now());
       const j=await res.json();
       if(j.status!=='ok') throw new Error(j.message||'Status tidak ok dari server');
       data=j.data||[];
       currentData=data; currentLabel=getBulanLabel(bulan);
+      filteredData=filterByKelas(data);
+
+      // Per-kelas grid (always uses full data)
+      renderKelasGrid(data);
 
       // Group by day
       const dayMap={};
-      data.forEach(r=>{
+      filteredData.forEach(r=>{
         const ts=(r.timestamp||'').trim();
         let d='?';
         if(ts){
@@ -332,7 +450,7 @@ async function loadRekap(){
       document.getElementById('chartTitle').textContent='Tren Harian — '+getBulanLabel(bulan);
       document.getElementById('chartSub').textContent='Jumlah pelanggaran per hari';
       renderChart(labels,vals,'Pelanggaran');
-      periodeGroups=buildDayGroups(data,bulan);
+      periodeGroups=buildDayGroups(filteredData,bulan);
     } else {
       const res=await fetch(URL_API+'?action=getRekapMinggu&bulan='+bulan+'&t='+Date.now());
       const j=await res.json();
@@ -340,23 +458,27 @@ async function loadRekap(){
       const mingguData=j.data||[];
       data=mingguData.flatMap(m=>m.rows||[]);
       currentData=data; currentLabel='Minggu — '+getBulanLabel(bulan);
-      const labels=mingguData.map(m=>m.label);
-      const vals=mingguData.map(m=>m.total);
+      filteredData=filterByKelas(data);
+      renderKelasGrid(data);
+      const fMinggu=kelasFilter==='semua'?mingguData:mingguData.map(mg=>({...mg,rows:(mg.rows||[]).filter(r=>r.kelas===kelasFilter),total:(mg.rows||[]).filter(r=>r.kelas===kelasFilter).length,poin:(mg.rows||[]).filter(r=>r.kelas===kelasFilter).reduce((a,r2)=>a+(Number(r2.poin)||0),0)}));
+      const labels=fMinggu.map(m=>m.label);
+      const vals=fMinggu.map(m=>m.total);
       document.getElementById('chartTitle').textContent='Tren Mingguan — '+getBulanLabel(bulan);
       document.getElementById('chartSub').textContent='Jumlah pelanggaran per minggu';
       renderChart(labels,vals,'Pelanggaran');
-      periodeGroups=mingguData.map(m=>({label:m.label,rows:m.rows||[],total:m.total,poin:m.poin}));
+      periodeGroups=fMinggu.map(m=>({label:m.label,rows:(m.rows||[]).filter(r=>kelasFilter==='semua'||r.kelas===kelasFilter),total:m.total,poin:m.poin}));
     }
 
     // Summary
-    const tot=data.length,totPoin=data.reduce((a,r)=>a+(Number(r.poin)||0),0);
-    const unik=[...new Set(data.map(r=>r.nama))].length;
+    const fd=filteredData.length?filteredData:filterByKelas(data);
+    const tot=fd.length,totPoin=fd.reduce((a,r)=>a+(Number(r.poin)||0),0);
+    const unik=[...new Set(fd.map(r=>r.nama))].length;
     animN('su1',tot);animN('su2',totPoin);animN('su3',unik);
-    document.getElementById('su1s').textContent=getBulanLabel(bulan);
+    document.getElementById('su1s').textContent=getBulanLabel(bulan)+(kelasFilter!=='semua'?' · '+kelasFilter:'');
     document.getElementById('su4').textContent=tot?( totPoin/tot).toFixed(1):'0';
 
     // Cats
-    renderCats(data);
+    renderCats(fd);
 
     // Periode blocks
     renderPeriode(periodeGroups);
@@ -503,6 +625,7 @@ async function doExport(){
 }
 
 function getBulanLabel(v){
+  if(!v||v.indexOf('-')===-1) return v||'';
   const months=['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
   const [y,m]=v.split('-');return months[parseInt(m)]+' '+y;
 }
@@ -521,6 +644,12 @@ function closeSb(){document.getElementById('sidebar').classList.remove('open');d
 
 // Auto-load bulan ini
 loadRekap();
-</script>
-</body>
+
+
+
+
+
+// Auto-refresh setiap 30 detik
+setInterval(()=>loadRekap(),30000);
+</script></body>
 </html>

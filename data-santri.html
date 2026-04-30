@@ -86,6 +86,7 @@ html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;col
 .fade{opacity:0;transform:translateY(8px);animation:fu .45s forwards}
 @keyframes fu{to{opacity:1;transform:translateY(0)}}
 .d1{animation-delay:.03s}.d2{animation-delay:.07s}.d3{animation-delay:.11s}
+
 </style>
 </head>
 <body>
@@ -186,7 +187,7 @@ async function loadAll(){
   try{
     const res=await fetch(URL_API+'?action=getAllSantri&t='+Date.now());
     const json=await res.json();
-    if(json.status!=='ok') throw new Error();
+    if(json.status!=='ok') throw new Error(json.message||'Status tidak ok dari server');
     allSantri=json.data||[];
     maxPoin=Math.max(1,...allSantri.map(s=>s.poin));
     document.getElementById('ms1').textContent=allSantri.length;
@@ -194,7 +195,7 @@ async function loadAll(){
     document.getElementById('ms3').textContent=allSantri.reduce((a,s)=>a+s.poin,0);
     applyFilter();
   }catch(e){
-    document.getElementById('tblBody').innerHTML='<tr><td colspan="7" class="c-load" style="color:var(--amber)">⚠ Gagal memuat. Klik Refresh.</td></tr>';
+    document.getElementById('tblBody').innerHTML='<tr><td colspan="7" class="c-load" style="color:var(--amber)">⚠ Gagal memuat data. Klik Refresh.</td></tr>';
     ['ms1','ms2','ms3'].forEach(id=>document.getElementById(id).textContent='—');
   }
 }
@@ -263,6 +264,11 @@ function doLogout(){if(confirm('Keluar?')){sessionStorage.removeItem('msbs_auth'
 function toggleSb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').style.display='block';}
 function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').style.display='none';}
 loadAll();
-</script>
-</body>
+
+
+
+
+// Auto-refresh setiap 30 detik
+setInterval(()=>loadAll(),30000);
+</script></body>
 </html>

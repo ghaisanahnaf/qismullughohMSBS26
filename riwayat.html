@@ -76,6 +76,7 @@ html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;col
 .fade{opacity:0;transform:translateY(8px);animation:fu .45s forwards}
 @keyframes fu{to{opacity:1;transform:translateY(0)}}
 .d1{animation-delay:.03s}.d2{animation-delay:.07s}.d3{animation-delay:.11s}
+
 </style>
 </head>
 <body>
@@ -305,6 +306,11 @@ function doLogout(){if(confirm('Keluar?')){sessionStorage.removeItem('msbs_auth'
 function toggleSb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').style.display='block';}
 function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').style.display='none';}
 loadData();
-</script>
-</body>
+
+
+
+
+// Auto-refresh setiap 30 detik
+setInterval(()=>loadData(),30000);
+</script></body>
 </html>
