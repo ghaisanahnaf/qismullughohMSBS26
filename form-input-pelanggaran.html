@@ -59,7 +59,7 @@ html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;col
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:.9rem}
 
 /* Jenis pills */
-.jenis-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.jenis-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .jenis-pill{
   padding:.7rem .9rem;border:1px solid var(--border);border-radius:2px;
   cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02);
@@ -189,17 +189,21 @@ html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;col
           <div class="field">
             <label>Jenis Pelanggaran</label>
             <div class="jenis-grid" id="jenisGrid">
-              <button class="jenis-pill" onclick="setJenis('Bahasa Kasar',1,this)">
-                <span class="jp-name"><span class="jp-dot" style="background:#E07070"></span>Bahasa Kasar</span>
+              <button class="jenis-pill" onclick="setJenis('Bahasa Indonesia',1,this)">
+                <span class="jp-name"><span class="jp-dot" style="background:#5EC98A"></span>Bahasa Indonesia</span>
                 <span class="jp-poin">1 poin</span>
               </button>
-              <button class="jenis-pill" onclick="setJenis('Bahasa Kotor',2,this)">
-                <span class="jp-name"><span class="jp-dot" style="background:#E8A84C"></span>Bahasa Kotor</span>
+              <button class="jenis-pill" onclick="setJenis('Tidak Bawa Buku/Kertas',1,this)">
+                <span class="jp-name"><span class="jp-dot" style="background:#C9A84C"></span>Tidak Bawa Buku/Kertas</span>
+                <span class="jp-poin">1 poin</span>
+              </button>
+              <button class="jenis-pill" onclick="setJenis('Bahasa Kasar',2,this)">
+                <span class="jp-name"><span class="jp-dot" style="background:#E8A84C"></span>Bahasa Kasar</span>
                 <span class="jp-poin">2 poin</span>
               </button>
-              <button class="jenis-pill" onclick="setJenis('Tidak Bawa Kertas/Buku',2,this)">
-                <span class="jp-name"><span class="jp-dot" style="background:#C9A84C"></span>Tidak Bawa Kertas/Buku</span>
-                <span class="jp-poin">2 poin</span>
+              <button class="jenis-pill" onclick="setJenis('Bahasa Kotor',3,this)">
+                <span class="jp-name"><span class="jp-dot" style="background:#E07070"></span>Bahasa Kotor</span>
+                <span class="jp-poin">3 poin</span>
               </button>
               <button class="jenis-pill" onclick="setJenis('Bahasa Daerah',3,this)">
                 <span class="jp-name"><span class="jp-dot" style="background:#5E9CE8"></span>Bahasa Daerah</span>

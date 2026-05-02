@@ -241,12 +241,13 @@ html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;col
 <script>
 const URL_API='https://script.google.com/macros/s/AKfycbwpgxBVltmc4sKNh-4mMNal5pWeG8iJaF3xWeFiDjwLACYDXrRKckYMxD45mHjErwI2/exec';
 const CATS=[
-  {name:'Bahasa Kasar',poin:1,color:'#FF6B6B'},
-  {name:'Bahasa Kotor',poin:2,color:'#FFB347'},
-  {name:'Tidak Bawa Kertas/Buku',poin:2,color:'#C9A84C'},
-  {name:'Bahasa Daerah',poin:3,color:'#5E9CE8'},
+  {name:'Bahasa Indonesia',      poin:1,color:'#5EC98A'},
+  {name:'Tidak Bawa Buku/Kertas',poin:1,color:'#C9A84C'},
+  {name:'Bahasa Kasar',          poin:2,color:'#FFB347'},
+  {name:'Bahasa Kotor',          poin:3,color:'#FF6B6B'},
+  {name:'Bahasa Daerah',         poin:3,color:'#5E9CE8'},
 ];
-let mode='bulan', rekapChart=null, currentData=[], currentLabel='', lastFilteredData=[];
+let mode='bulan', rekapChart=null, currentData=[], currentLabel='';
 const now=new Date();
 document.getElementById('dateChip').textContent=now.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
 const mo=(now.getMonth()+1).toString().padStart(2,'0');
@@ -426,7 +427,6 @@ async function loadRekap(){
       data=j.data||[];
       currentData=data; currentLabel=getBulanLabel(bulan);
       filteredData=filterByKelas(data);
-      lastFilteredData=filteredData;
 
       // Per-kelas grid (always uses full data)
       renderKelasGrid(data);
@@ -460,7 +460,6 @@ async function loadRekap(){
       data=mingguData.flatMap(m=>m.rows||[]);
       currentData=data; currentLabel='Minggu — '+getBulanLabel(bulan);
       filteredData=filterByKelas(data);
-      lastFilteredData=filteredData;
       renderKelasGrid(data);
       const fMinggu=kelasFilter==='semua'?mingguData:mingguData.map(mg=>({...mg,rows:(mg.rows||[]).filter(r=>r.kelas===kelasFilter),total:(mg.rows||[]).filter(r=>r.kelas===kelasFilter).length,poin:(mg.rows||[]).filter(r=>r.kelas===kelasFilter).reduce((a,r2)=>a+(Number(r2.poin)||0),0)}));
       const labels=fMinggu.map(m=>m.label);
@@ -589,13 +588,9 @@ async function doExport(){
   const btn=document.getElementById('exportBtn');
   btn.disabled=true;btn.textContent='Mengekspor...';
   try{
-    // Gunakan data yang sudah difilter sesuai kelas aktif
-    const exportData=lastFilteredData.length?lastFilteredData:filterByKelas(currentData);
-    const exportLabel=currentLabel+(kelasFilter!=='semua'?' — '+kelasFilter:'');
-
     // Gabungkan baris dengan nama santri yang sama → 1 baris, poin dijumlah
     const grouped={};
-    exportData.forEach(r=>{
+    currentData.forEach(r=>{
       const key=(r.nama||'')+'||'+(r.kelas||'');
       if(!grouped[key]){
         grouped[key]={
@@ -620,7 +615,7 @@ async function doExport(){
     const res=await fetch(URL_API,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'exportRekap',label:exportLabel,rows}),
+      body:JSON.stringify({action:'exportRekap',label:currentLabel,rows}),
       mode:'no-cors'
     });
     showToast('✓','Rekap berhasil diekspor ke Google Sheets! Buka Sheets untuk melihat tab baru.');
