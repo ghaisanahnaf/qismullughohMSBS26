@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script>
+(function(){
+  var auth=sessionStorage.getItem('msbs_auth');
+  if(!auth){window.location.replace('login.html');throw new Error('unauth');}
+  try{
+    var d=JSON.parse(atob(auth));
+    if(!d.user||!d.ts||(Date.now()-d.ts)>86400000){
+      sessionStorage.removeItem('msbs_auth');
+      window.location.replace('login.html');
+      throw new Error('expired');
+    }
+  }catch(e){
+    if(e.message!=='expired'&&e.message!=='unauth'){
+      sessionStorage.removeItem('msbs_auth');
+      window.location.replace('login.html');
+    }
+    throw e;
+  }
+})();
+</script>
+
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Rekap & Laporan — MSBS</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet"/>

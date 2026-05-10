@@ -1,156 +1,212 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Login — MSBS</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script>
+// Kalau sudah login, langsung ke dashboard
+(function(){
+  var auth=sessionStorage.getItem('msbs_auth');
+  if(auth){try{var d=JSON.parse(atob(auth));if(d.user&&d.ts&&(Date.now()-d.ts)<86400000){window.location.replace('dashboard.html');}}catch(e){sessionStorage.removeItem('msbs_auth');}}
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --gold:#C9A84C;--gold-light:#E8C97A;--gold-dim:#8B6E2E;
-  --deep:#0A0A0F;--panel:#16161F;
-  --border:rgba(201,168,76,0.18);--text:#F0EAD6;
-  --muted:rgba(240,234,214,0.45);--error:#E07070;
-}
-html,body{height:100%;background:var(--deep);font-family:'Outfit',sans-serif;color:var(--text);overflow:hidden}
-.bg{position:fixed;inset:0;z-index:0;
-  background:radial-gradient(ellipse 80% 60% at 20% 50%,#1a1408 0%,transparent 60%),
-             radial-gradient(ellipse 60% 80% at 80% 20%,#12100a 0%,transparent 55%),var(--deep)}
-.bg::before{content:'';position:absolute;inset:0;
-  background-image:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(201,168,76,0.04) 60px),
-                   repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(201,168,76,0.04) 60px)}
-.orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
-.orb-1{width:500px;height:500px;background:rgba(201,168,76,0.07);top:-100px;left:-100px;animation:drift 12s ease-in-out infinite alternate}
-.orb-2{width:400px;height:400px;background:rgba(100,80,180,0.06);bottom:-80px;right:-80px;animation:drift 15s ease-in-out infinite alternate-reverse}
-@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.08)}}
-.page{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
-.left{display:flex;flex-direction:column;justify-content:center;padding:4rem;border-right:1px solid var(--border);position:relative;overflow:hidden}
-.left::after{content:'';position:absolute;right:0;top:15%;bottom:15%;width:1px;background:linear-gradient(to bottom,transparent,var(--gold-dim),transparent)}
-.monogram{font-family:'Cormorant Garamond',serif;font-size:5rem;font-weight:300;line-height:1;color:var(--gold);letter-spacing:-0.02em;margin-bottom:1.5rem;opacity:0;animation:fadeUp 0.8s 0.1s forwards}
-.brand-name{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;letter-spacing:0.15em;color:var(--gold-light);margin-bottom:0.5rem;opacity:0;animation:fadeUp 0.8s 0.2s forwards}
-.brand-sub{font-size:0.78rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);margin-bottom:3rem;opacity:0;animation:fadeUp 0.8s 0.3s forwards}
-.divider-gold{width:48px;height:1px;background:linear-gradient(to right,var(--gold),transparent);margin-bottom:2rem;opacity:0;animation:fadeUp 0.8s 0.35s forwards}
-.tagline{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;line-height:1.8;color:rgba(240,234,214,0.6);max-width:320px;opacity:0;animation:fadeUp 0.8s 0.4s forwards}
-.deco-corner{position:absolute;bottom:2.5rem;left:4rem;display:flex;align-items:center;gap:10px;opacity:0;animation:fadeUp 0.8s 0.6s forwards}
-.deco-dot{width:6px;height:6px;border-radius:50%;background:var(--gold-dim)}
-.deco-line{width:40px;height:1px;background:var(--gold-dim)}
-.deco-text{font-size:0.7rem;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase}
-.right{display:flex;align-items:center;justify-content:center;padding:2rem}
-.card{width:100%;max-width:420px;background:var(--panel);border:1px solid var(--border);border-radius:2px;padding:3rem 2.5rem;position:relative;opacity:0;animation:fadeUp 0.9s 0.3s forwards}
-.card::before,.card::after{content:'';position:absolute;width:20px;height:20px;border-color:var(--gold-dim);border-style:solid}
-.card::before{top:-1px;left:-1px;border-width:2px 0 0 2px}
-.card::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
-.card-title{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:400;color:var(--text);margin-bottom:0.35rem;letter-spacing:0.02em}
-.card-subtitle{font-size:0.78rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:2.5rem}
-.field{margin-bottom:1.4rem}
-.field label{display:block;font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:0.5rem}
-.field-wrap{position:relative}
-.field input{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:2px;padding:0.85rem 1rem;font-family:'Outfit',sans-serif;font-size:0.9rem;color:var(--text);outline:none;transition:border-color 0.25s,background 0.25s;letter-spacing:0.03em}
-.field input::placeholder{color:rgba(240,234,214,0.2)}
-.field input:focus{border-color:var(--gold-dim);background:rgba(201,168,76,0.04)}
-.toggle-pw{position:absolute;right:0.85rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s;padding:4px}
-.toggle-pw:hover{color:var(--gold)}
-.error-msg{font-size:0.78rem;color:var(--error);margin-top:-0.8rem;margin-bottom:1rem;display:none;letter-spacing:0.05em}
-.btn-login{width:100%;margin-top:0.5rem;padding:0.9rem;background:transparent;border:1px solid var(--gold-dim);border-radius:2px;font-family:'Outfit',sans-serif;font-size:0.78rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold-light);cursor:pointer;position:relative;overflow:hidden;transition:border-color 0.3s,color 0.3s}
-.btn-login::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.05));opacity:0;transition:opacity 0.3s}
-.btn-login:hover{border-color:var(--gold)}.btn-login:hover::before{opacity:1}
-.btn-login:active{transform:scale(0.99)}.btn-login:disabled{opacity:0.4;cursor:not-allowed}
-.btn-text{position:relative;z-index:1}
-.success-screen{display:none;flex-direction:column;align-items:center;text-align:center;padding:1rem 0}
-.success-icon{width:56px;height:56px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;animation:scaleIn 0.5s ease}
-.success-icon svg{stroke:var(--gold)}
-@keyframes scaleIn{from{transform:scale(0.5);opacity:0}to{transform:scale(1);opacity:1}}
-.success-greeting{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:400;color:var(--gold-light);margin-bottom:0.5rem}
-.success-msg{font-size:0.82rem;color:var(--muted);letter-spacing:0.1em;margin-bottom:2rem}
-.next-btn{padding:0.7rem 2rem;background:none;border:1px solid var(--gold-dim);border-radius:2px;color:var(--gold);font-family:'Outfit',sans-serif;font-size:0.75rem;letter-spacing:0.25em;text-transform:uppercase;cursor:pointer;transition:border-color 0.2s,background 0.2s}
-.next-btn:hover{border-color:var(--gold);background:rgba(201,168,76,0.06)}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:768px){
-  html,body{overflow:auto}
-  .page{grid-template-columns:1fr;min-height:100vh}
-  .left{display:none}
-  .right{padding:1.5rem;align-items:flex-start;padding-top:3rem}
-  .card{padding:2rem 1.5rem}
-  .mobile-logo{display:flex!important;flex-direction:column;align-items:center;text-align:center;margin-bottom:2rem}
-  .mobile-monogram{font-family:'Cormorant Garamond',serif;font-size:3rem;color:var(--gold);font-weight:300}
-  .mobile-brand{font-size:0.75rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);margin-top:6px}
-}
-.mobile-logo{display:none}
+  :root{
+    --bg:#08080f;--card:#0e0e1a;--border:rgba(255,255,255,.07);
+    --gold:#C9A84C;--gold-light:#e0c06a;--gold-dim:rgba(201,168,76,.4);
+    --gold-faint:rgba(201,168,76,.07);--text:#e8e6df;--muted:rgba(232,230,223,.45);
+    --red:#e05c5c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+  
+  /* subtle background grid */
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(201,168,76,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+
+  .wrap{width:100%;max-width:360px;padding:1.5rem}
+  
+  .brand{text-align:center;margin-bottom:2.5rem}
+  .brand-logo{font-size:1.8rem;font-weight:600;letter-spacing:.25em;color:var(--gold);font-family:'Outfit',sans-serif}
+  .brand-sub{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:4px;line-height:1.6}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:2rem}
+  
+  .card-title{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
+
+  .field{margin-bottom:1rem}
+  .field label{display:block;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem}
+  .field input{
+    width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);
+    border-radius:2px;padding:.65rem .85rem;color:var(--text);font-family:'Outfit',sans-serif;
+    font-size:.85rem;outline:none;transition:border-color .2s;
+  }
+  .field input:focus{border-color:var(--gold-dim)}
+  .field input.err{border-color:var(--red)}
+
+  .err-msg{font-size:.7rem;color:var(--red);margin-top:.4rem;display:none}
+  .err-msg.show{display:block}
+
+  .btn{
+    width:100%;margin-top:1.5rem;padding:.75rem;background:var(--gold-faint);
+    border:1px solid var(--gold-dim);color:var(--gold-light);border-radius:2px;
+    font-family:'Outfit',sans-serif;font-size:.75rem;letter-spacing:.15em;
+    text-transform:uppercase;cursor:pointer;transition:all .2s;
+  }
+  .btn:hover{background:rgba(201,168,76,.15);border-color:var(--gold)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  .attempt-msg{font-size:.65rem;color:var(--muted);text-align:center;margin-top:1rem;min-height:1rem}
+  
+  .lockout{display:none;text-align:center;padding:1rem;border:1px solid rgba(224,92,92,.3);border-radius:2px;background:rgba(224,92,92,.05);margin-top:1rem}
+  .lockout.show{display:block}
+  .lockout p{font-size:.72rem;color:var(--red)}
+  .lockout .countdown{font-size:1.2rem;color:var(--red);font-family:'Cormorant Garamond',serif;margin-top:.3rem}
 </style>
 </head>
 <body>
-<div class="bg"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
-<div class="page">
-  <div class="left">
-    <div class="monogram">MSBS</div>
-    <div class="brand-name">Qismullughoh</div>
-    <div class="brand-sub">Sistem Pelanggaran Bahasa</div>
-    <div class="divider-gold"></div>
-    <p class="tagline">Portal pengelolaan data pelanggaran bahasa santri secara terpadu, aman, dan efisien.</p>
-    <div class="deco-corner"><div class="deco-dot"></div><div class="deco-line"></div><span class="deco-text">Versi 1.0</span></div>
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-logo">MSBS</div>
+    <div class="brand-sub">Sistem Pelanggaran Bahasa<br>Qismullughoh</div>
   </div>
-  <div class="right">
-    <div class="card">
-      <div class="mobile-logo">
-        <span class="mobile-monogram">MSBS</span>
-        <span class="mobile-brand">Sistem Pelanggaran Bahasa</span>
-      </div>
-      <div id="loginForm">
-        <div class="card-title">Selamat Datang</div>
-        <div class="card-subtitle">Masuk ke akun Anda</div>
-        <div class="field">
-          <label for="username">Username</label>
-          <input type="text" id="username" placeholder="Masukkan username" autocomplete="username"/>
-        </div>
-        <div class="field">
-          <label for="password">Sandi</label>
-          <div class="field-wrap">
-            <input type="password" id="password" placeholder="Masukkan sandi" autocomplete="current-password"/>
-            <button class="toggle-pw" onclick="togglePw()" type="button" id="toggleBtn">Lihat</button>
-          </div>
-        </div>
-        <div class="error-msg" id="errMsg">Username atau sandi tidak valid.</div>
-        <button class="btn-login" onclick="doLogin()" id="loginBtn"><span class="btn-text">Masuk</span></button>
-      </div>
-      <div class="success-screen" id="successScreen">
-        <div class="success-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </div>
-        <div class="success-greeting" id="greetingText">Selamat Datang</div>
-        <div class="success-msg">Login berhasil — memuat dashboard...</div>
-        <button class="next-btn" onclick="window.location.href='dashboard.html'">Lanjut ke Dashboard →</button>
-      </div>
+
+  <div class="card">
+    <div class="card-title">Masuk ke Sistem</div>
+
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="username" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      <div class="err-msg" id="errMsg">Username atau password salah.</div>
+    </div>
+
+    <button class="btn" id="loginBtn" onclick="doLogin()">Masuk</button>
+    <div class="attempt-msg" id="attemptMsg"></div>
+
+    <div class="lockout" id="lockoutBox">
+      <p>Terlalu banyak percobaan gagal. Coba lagi dalam:</p>
+      <div class="countdown" id="countdown"></div>
     </div>
   </div>
 </div>
+
 <script>
-const VALID_USER='qismullughohmsbs', VALID_PASS='sanahrobiah';
-function togglePw(){
-  const pw=document.getElementById('password'),btn=document.getElementById('toggleBtn');
-  pw.type=pw.type==='password'?'text':'password';
-  btn.textContent=pw.type==='password'?'Lihat':'Sembunyikan';
+// ── Kredensial (hash SHA-256 di sisi client) ──────────────────────────────────
+// Untuk keamanan lebih: ganti USERS dengan hash SHA-256 dari password
+// sha256("password") → hash. Gunakan: https://emn178.github.io/online-tools/sha256.html
+const USERS = {
+  'admin':          'qismullughohmsbs',   // username: password
+  'qismullughohmsbs': 'msbs2026',
+};
+
+// ── Lockout config ────────────────────────────────────────────────────────────
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS   = 5 * 60 * 1000; // 5 menit
+
+let attempts = parseInt(sessionStorage.getItem('msbs_attempts')||'0');
+let lockedUntil = parseInt(sessionStorage.getItem('msbs_locked')||'0');
+let countdownTimer = null;
+
+function isLocked(){
+  return lockedUntil > Date.now();
 }
-function doLogin(){
-  const u=document.getElementById('username').value.trim(),p=document.getElementById('password').value;
-  const err=document.getElementById('errMsg'),btn=document.getElementById('loginBtn');
-  err.style.display='none';
-  if(!u||!p){err.textContent='Username dan sandi wajib diisi.';err.style.display='block';return}
-  btn.disabled=true;btn.querySelector('.btn-text').textContent='Memverifikasi...';
-  setTimeout(()=>{
-    if(u===VALID_USER&&p===VALID_PASS){
-      sessionStorage.setItem('msbs_auth','1');
-      document.getElementById('loginForm').style.display='none';
-      const s=document.getElementById('successScreen');s.style.display='flex';
-      document.getElementById('greetingText').textContent='Ahlan, '+u.substring(0,12)+'...';
-    }else{
-      err.textContent='Username atau sandi tidak valid.';err.style.display='block';
-      btn.disabled=false;btn.querySelector('.btn-text').textContent='Masuk';
-      document.getElementById('password').value='';document.getElementById('password').focus();
+
+function updateAttemptMsg(){
+  const el = document.getElementById('attemptMsg');
+  const rem = MAX_ATTEMPTS - attempts;
+  if(attempts > 0 && !isLocked()){
+    el.textContent = rem + ' percobaan tersisa.';
+  } else {
+    el.textContent = '';
+  }
+}
+
+function startLockoutUI(){
+  document.getElementById('lockoutBox').classList.add('show');
+  document.getElementById('loginBtn').disabled = true;
+  document.getElementById('attemptMsg').textContent = '';
+
+  function tick(){
+    const ms = lockedUntil - Date.now();
+    if(ms <= 0){
+      document.getElementById('lockoutBox').classList.remove('show');
+      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('countdown').textContent = '';
+      attempts = 0;
+      sessionStorage.removeItem('msbs_attempts');
+      sessionStorage.removeItem('msbs_locked');
+      updateAttemptMsg();
+      return;
     }
-  },900);
+    const m = Math.floor(ms/60000);
+    const s = Math.floor((ms%60000)/1000);
+    document.getElementById('countdown').textContent =
+      String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    countdownTimer = setTimeout(tick, 500);
+  }
+  tick();
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+// Check lockout on load
+if(isLocked()) startLockoutUI();
+updateAttemptMsg();
+
+// Enter key support
+document.addEventListener('keydown', function(e){
+  if(e.key==='Enter' && !document.getElementById('loginBtn').disabled) doLogin();
+});
+
+function doLogin(){
+  if(isLocked()) return;
+
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value;
+  const errEl = document.getElementById('errMsg');
+
+  errEl.classList.remove('show');
+  document.getElementById('username').classList.remove('err');
+  document.getElementById('password').classList.remove('err');
+
+  if(!user || !pass){
+    errEl.textContent = 'Isi username dan password.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  // Check credentials
+  if(USERS[user] && USERS[user] === pass){
+    // Success — buat token
+    attempts = 0;
+    sessionStorage.removeItem('msbs_attempts');
+    sessionStorage.removeItem('msbs_locked');
+
+    const token = btoa(JSON.stringify({user: user, ts: Date.now()}));
+    sessionStorage.setItem('msbs_auth', token);
+    window.location.replace('dashboard.html');
+  } else {
+    // Failed
+    attempts++;
+    sessionStorage.setItem('msbs_attempts', attempts);
+
+    if(attempts >= MAX_ATTEMPTS){
+      lockedUntil = Date.now() + LOCKOUT_MS;
+      sessionStorage.setItem('msbs_locked', lockedUntil);
+      startLockoutUI();
+    } else {
+      errEl.textContent = 'Username atau password salah.';
+      errEl.classList.add('show');
+      document.getElementById('username').classList.add('err');
+      document.getElementById('password').classList.add('err');
+      updateAttemptMsg();
+    }
+  }
+}
 </script>
 </body>
 </html>
